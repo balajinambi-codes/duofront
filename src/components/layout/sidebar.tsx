@@ -86,7 +86,7 @@ export default function Sidebar() {
         {/* PROFILE SECTION */}
         <div className="mt-6 rounded-3xl border border-gray-200 p-4">
           <div className="flex items-center gap-4">
-            <UserButton afterSignOutUrl="/sign-in" />
+            <UserButton />
 
             <div>
               <p className="font-semibold text-gray-900">
@@ -99,7 +99,7 @@ export default function Sidebar() {
             </div>
           </div>
 
-          <SignOutButton>
+          <SignOutButton redirectUrl="/sign-in">
             <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-red-50 px-4 py-3 font-semibold text-red-500 transition hover:bg-red-100">
               <LogOut size={18} />
               Logout
