@@ -25,7 +25,7 @@ export default async function LeaderboardPage() {
     )) || [];
 
   // SORT BY XP
-  const sortedUsers = users.sort(
+  const sortedUsers = [...users].sort(
     (a: any, b: any) => b.xp - a.xp
   );
 

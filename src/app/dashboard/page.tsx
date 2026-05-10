@@ -22,6 +22,12 @@ import { syncUser } from "@/lib/sync-user";
 
 import { getDashboardData } from "@/lib/get-dashboard-data";
 
+import AchievementCard from "@/components/dashboard/achievement-card";
+
+import { achievements } from "@/lib/achievements";
+
+import XpProgress from "@/components/dashboard/xp-progress";
+
 export default async function DashboardPage() {
   const { userId } = await auth();
 
@@ -95,6 +101,42 @@ export default async function DashboardPage() {
           />
         </div>
 
+        {/* XP PROGRESS */}
+        <div className="mt-10">
+          <XpProgress
+            xp={user.xp}
+            level={user.level}
+          />
+        </div>
+        {/* ACHIEVEMENTS */}
+        <div className="mt-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-4xl font-extrabold text-[#0B1736]">
+              Achievements
+            </h2>
+
+            <p className="font-bold text-green-600">
+              {achievements.length} Badges
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {achievements.map(
+              (achievement) => (
+                <AchievementCard
+                  key={achievement.id}
+                  icon={achievement.icon}
+                  title={
+                    achievement.title
+                  }
+                  description={
+                    achievement.description
+                  }
+                />
+              )
+            )}
+          </div>
+        </div>
         {/* CONTINUE LEARNING */}
         <div className="mt-10 w-full overflow-hidden rounded-[32px] bg-gradient-to-r from-green-500 to-emerald-400 p-6 text-white shadow-xl md:p-10">
           <p className="text-sm font-semibold uppercase tracking-wide text-green-100">

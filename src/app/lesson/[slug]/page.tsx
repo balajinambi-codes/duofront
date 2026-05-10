@@ -13,7 +13,13 @@ import ReactMarkdown from "react-markdown";
 
 import CompleteButton from "@/components/lesson/complete-button";
 
+import CodePlayground from "@/components/lesson/code-playground";
+
+import XpPopup from "./xp-popup";
+
 import { getProgress } from "@/lib/get-progress";
+
+import QuizCard from "@/components/lesson/quiz-card";
 
 import { syncUser } from "@/lib/sync-user";
 
@@ -29,10 +35,13 @@ import {
 export default async function LessonPage({
   params,
 }: {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }) {
+  const { slug } = await params;
+
+  // AUTH
   const { userId } = await auth();
 
   if (!userId) {
@@ -48,7 +57,8 @@ export default async function LessonPage({
 
   // USER PROGRESS
   const progress =
-    await getProgress(user.id);
+    (await getProgress(user.id)) ||
+    [];
 
   // COMPLETED LESSON IDS
   const completedLessons =
@@ -80,20 +90,22 @@ export default async function LessonPage({
   }
 
   // FETCH PATHS
-  const paths = await apiFetch(
-    "/api/paths"
-  );
+  const paths =
+    (await apiFetch(
+      "/api/paths"
+    )) || [];
 
   let currentLesson: any = null;
 
   let currentPath: any = null;
 
-  // FIND CURRENT LESSON
+  // FIND LESSON
   for (const path of paths) {
-    const lesson = path.lessons.find(
-      (lesson: any) =>
-        lesson.slug === params.slug
-    );
+    const lesson =
+      path.lessons?.find(
+        (lesson: any) =>
+          lesson.slug === slug
+      );
 
     if (lesson) {
       currentLesson = lesson;
@@ -104,15 +116,13 @@ export default async function LessonPage({
     }
   }
 
-  if (!currentLesson) {
+  // LESSON NOT FOUND
+  if (
+    !currentLesson ||
+    !currentPath
+  ) {
     redirect("/learn");
   }
-
-  // CURRENT LESSON COMPLETED
-  const isCompleted =
-    completedLessons.includes(
-      currentLesson.id
-    );
 
   // LESSON INDEX
   const lessonIndex =
@@ -120,6 +130,26 @@ export default async function LessonPage({
       (lesson: any) =>
         lesson.id ===
         currentLesson.id
+    );
+
+  // UNLOCK CHECK
+  const unlocked =
+    lessonIndex === 0 ||
+    completedLessons.includes(
+      currentPath.lessons[
+        lessonIndex - 1
+      ]?.id
+    );
+
+  // BLOCK LOCKED LESSON
+  if (!unlocked) {
+    redirect("/learn");
+  }
+
+  // CURRENT LESSON COMPLETED
+  const isCompleted =
+    completedLessons.includes(
+      currentLesson.id
     );
 
   // PREVIOUS LESSON
@@ -163,7 +193,7 @@ export default async function LessonPage({
                     lesson.id
                   );
 
-                const unlocked =
+                const lessonUnlocked =
                   index === 0 ||
                   completedLessons.includes(
                     currentPath.lessons[
@@ -174,17 +204,25 @@ export default async function LessonPage({
                 return (
                   <Link
                     key={lesson.id}
-                    href={`/lesson/${lesson.slug}`}
+                    href={
+                      lessonUnlocked
+                        ? `/lesson/${lesson.slug}`
+                        : "#"
+                    }
                     className={`flex items-center gap-4 rounded-2xl px-4 py-4 transition ${
                       active
                         ? "bg-green-500 text-white"
                         : "hover:bg-gray-100"
+                    } ${
+                      !lessonUnlocked
+                        ? "cursor-not-allowed opacity-60"
+                        : ""
                     }`}
                   >
                     <div>
                       {completed ? (
                         <CheckCircle2 />
-                      ) : unlocked ? (
+                      ) : lessonUnlocked ? (
                         <ChevronRight />
                       ) : (
                         <Lock />
@@ -208,7 +246,7 @@ export default async function LessonPage({
             {currentLesson.title}
           </h1>
 
-          <p className="mt-4 text-base text-gray-500 md:text-xl">
+          <p className="mt-4 text-base leading-8 text-gray-500 md:text-xl">
             {
               currentLesson.description
             }
@@ -221,7 +259,7 @@ export default async function LessonPage({
             </ReactMarkdown>
           </div>
 
-          {/* CODE */}
+          {/* EXAMPLE CODE */}
           {currentLesson.exampleCode && (
             <div className="mt-10 overflow-hidden rounded-[32px] bg-[#1E1E1E] shadow-xl">
               <div className="border-b border-white/10 px-6 py-4 text-sm font-bold text-green-400">
@@ -238,6 +276,49 @@ export default async function LessonPage({
             </div>
           )}
 
+          {/* PLAYGROUND */}
+          <CodePlayground
+            userId={user.id}
+            lessonId={currentLesson.id}
+            lessonSlug={
+              currentLesson.slug
+            }
+            challengeTitle="Create a Green Heading"
+
+            challengeDescription="Create an h1 tag and make it green using CSS."
+
+            validationChecks={[
+              "<h1",
+              "green",
+            ]}
+            defaultHtml={`<h1>Hello DuoCode 🚀</h1>
+
+<p>Edit this code and click Run.</p>`}
+            defaultCss={`body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  color: green;
+}`}
+            defaultJs={`console.log("DuoCode Running 🚀");`}
+          />
+          {/* QUIZ */}
+          <QuizCard
+            question="Which HTML tag creates the largest heading?"
+
+            options={[
+              "<p>",
+              "<div>",
+              "<h1>",
+              "<span>",
+            ]}
+
+            correctAnswer="<h1>"
+
+            explanation="The h1 tag creates the largest heading in HTML."
+          />
           {/* ACTIONS */}
           <div className="mt-14 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             {/* PREVIOUS */}
