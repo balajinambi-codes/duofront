@@ -13,7 +13,7 @@ export default function StatsCard({
 }: Props) {
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
-      <div className="flex items-center justify-between">
+      <div className="flex-responsive">
         <div>
           <p className="text-sm text-gray-500">
             {title}

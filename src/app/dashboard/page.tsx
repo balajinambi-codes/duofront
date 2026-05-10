@@ -1,11 +1,15 @@
-import Sidebar from "@/components/layout/sidebar";
+import AppLayout from "@/components/layout/app-layout";
+
 import StatsCard from "@/components/dashboard/stats-card";
 
 import {
   Trophy,
   Flame,
   BookOpen,
+  Rocket,
 } from "lucide-react";
+
+import Link from "next/link";
 
 import { redirect } from "next/navigation";
 
@@ -16,6 +20,8 @@ import {
 
 import { syncUser } from "@/lib/sync-user";
 
+import { getDashboardData } from "@/lib/get-dashboard-data";
+
 export default async function DashboardPage() {
   const { userId } = await auth();
 
@@ -25,43 +31,51 @@ export default async function DashboardPage() {
   }
 
   // GET CLERK USER
-  const clerkUser = await currentUser();
+  const clerkUser =
+    await currentUser();
 
   const email =
-    clerkUser?.primaryEmailAddress?.emailAddress;
+    clerkUser?.primaryEmailAddress
+      ?.emailAddress;
 
-  // HOTMAIL ONLY
+  // EMAIL RESTRICTION
   if (
-    !email?.endsWith("@francisxavier.ac.in")
+    !email?.endsWith(
+      "@francisxavier.ac.in"
+    )
   ) {
     redirect("/blocked");
   }
 
-  // SYNC DATABASE USER
+  // DATABASE USER
   const user = await syncUser();
 
   if (!user) {
     redirect("/sign-in");
   }
 
-  return (
-    <div className="flex min-h-screen bg-[#F3F7F5]">
-      <Sidebar />
+  // DASHBOARD DATA
+  const dashboard =
+    await getDashboardData(
+      user.id
+    );
 
-      <main className="flex-1 p-8">
+  return (
+    <AppLayout>
+      <div className="w-full overflow-hidden">
         {/* HEADER */}
         <div>
-          <h1 className="text-5xl font-extrabold tracking-tight">
+          <h1 className="break-words text-3xl font-extrabold tracking-tight text-[#0B1736] md:text-5xl">
             Hey, {user.name} 👋
           </h1>
 
-          <p className="mt-3 text-lg text-gray-500">
+          <p className="mt-3 text-base text-gray-500 md:text-lg">
             Ready to level up today?
           </p>
         </div>
 
         {/* STATS */}
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <StatsCard
             title="Total XP"
             value={`${user.xp}`}
@@ -69,38 +83,72 @@ export default async function DashboardPage() {
           />
 
           <StatsCard
-            title="Daily Streak"
-            value={`${user.streak} Days`}
-            icon={<Flame />}
+            title="Completed"
+            value={`${dashboard.completedCount}/${dashboard.totalLessons}`}
+            icon={<BookOpen />}
           />
 
           <StatsCard
-            title="Level"
-            value={`${user.level}`}
-            icon={<BookOpen />}
+            title="Progress"
+            value={`${dashboard.percentage}%`}
+            icon={<Rocket />}
           />
         </div>
 
         {/* CONTINUE LEARNING */}
-        <div className="mt-10 rounded-[32px] bg-gradient-to-r from-green-500 to-emerald-400 p-10 text-white shadow-xl">
+        <div className="mt-10 w-full overflow-hidden rounded-[32px] bg-gradient-to-r from-green-500 to-emerald-400 p-6 text-white shadow-xl md:p-10">
           <p className="text-sm font-semibold uppercase tracking-wide text-green-100">
             Continue Learning
           </p>
 
-          <h2 className="mt-4 text-4xl font-extrabold">
-            HTML Basics
+          <h2 className="mt-4 break-words text-3xl font-extrabold md:text-5xl">
+            {dashboard.nextLesson
+              ?.title ||
+              "Frontend Foundations Complete 🎉"}
           </h2>
 
-          <p className="mt-4 max-w-2xl text-lg text-green-50">
-            Continue mastering frontend development
-            through interactive coding lessons.
+          <p className="mt-4 max-w-2xl text-base leading-8 text-green-50 md:text-lg">
+            {dashboard.nextLesson
+              ?.description ||
+              "You completed the frontend foundation roadmap."}
           </p>
 
-          <button className="mt-8 rounded-2xl bg-white px-8 py-4 text-lg font-bold text-green-600 transition hover:scale-105">
-            Continue Path
-          </button>
+          {/* PROGRESS BAR */}
+          <div className="mt-8">
+            <div className="flex items-center justify-between text-sm font-bold">
+              <span>
+                Course Progress
+              </span>
+
+              <span>
+                {
+                  dashboard.percentage
+                }
+                %
+              </span>
+            </div>
+
+            <div className="mt-3 h-4 overflow-hidden rounded-full bg-white/20">
+              <div
+                className="h-full rounded-full bg-white transition-all"
+                style={{
+                  width: `${dashboard.percentage}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* BUTTON */}
+          {dashboard.nextLesson && (
+            <Link
+              href={`/lesson/${dashboard.nextLesson.slug}`}
+              className="mt-8 inline-flex rounded-2xl bg-white px-8 py-4 text-lg font-bold text-green-600 transition hover:scale-105"
+            >
+              Continue Path
+            </Link>
+          )}
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

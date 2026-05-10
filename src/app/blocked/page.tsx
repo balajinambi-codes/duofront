@@ -37,7 +37,7 @@ export default function BlockedPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#F5FAF7] p-8 text-center">
       <div className="rounded-[40px] bg-white p-14 shadow-2xl">
-        <h1 className="text-6xl font-extrabold text-red-500">
+        <h1 className="heading-xl font-extrabold text-red-500">
           Access Denied
         </h1>
 

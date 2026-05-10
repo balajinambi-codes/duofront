@@ -7,14 +7,23 @@ export async function syncUser() {
 
   if (!user) return null;
 
-  return apiFetch("/api/users/create", {
-    method: "POST",
+  return apiFetch(
+    "/api/users/create",
+    {
+      method: "POST",
 
-    body: JSON.stringify({
-      clerkId: user.id,
-      email: user.emailAddresses[0].emailAddress,
-      name: user.fullName,
-      imageUrl: user.imageUrl,
-    }),
-  });
+      body: JSON.stringify({
+        clerkId: user.id,
+
+        email:
+          user.emailAddresses[0]
+            .emailAddress,
+
+        name: user.fullName,
+
+        imageUrl:
+          user.imageUrl,
+      }),
+    }
+  );
 }

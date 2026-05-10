@@ -19,7 +19,10 @@ export default async function LeaderboardPage() {
   }
 
   // FETCH USERS
-  const users = await apiFetch("/api/users");
+  const users =
+    (await apiFetch(
+      "/api/leaderboard"
+    )) || [];
 
   // SORT BY XP
   const sortedUsers = users.sort(
@@ -37,7 +40,7 @@ export default async function LeaderboardPage() {
             <Trophy className="h-10 w-10 text-yellow-500" />
           </div>
 
-          <h1 className="mt-5 text-5xl font-extrabold tracking-tight">
+          <h1 className="mt-5 text-3xl md:text-5xl font-extrabold tracking-tight">
             Leaderboard
           </h1>
 
@@ -57,7 +60,7 @@ export default async function LeaderboardPage() {
                 return (
                   <div
                     key={user.id}
-                    className={`flex items-center justify-between rounded-3xl border p-5 transition-all ${
+                    className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-3xl border p-5 transition-all ${
                       isCurrentUser
                         ? "border-green-300 bg-green-50 shadow-md"
                         : "border-transparent bg-gray-50 hover:bg-gray-100"
