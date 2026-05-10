@@ -13,10 +13,8 @@ export default function LevelUpModal({
 }: Props) {
   return (
     <>
-      {/* CONFETTI */}
       <Confetti />
 
-      {/* MODAL */}
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-6">
         <motion.div
           initial={{
@@ -29,12 +27,10 @@ export default function LevelUpModal({
           }}
           className="w-full max-w-lg rounded-[40px] bg-white p-10 text-center shadow-2xl"
         >
-          {/* ICON */}
           <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-yellow-100 text-6xl">
             🚀
           </div>
 
-          {/* TITLE */}
           <h1 className="mt-8 text-5xl font-extrabold text-[#0B1736]">
             LEVEL UP!
           </h1>

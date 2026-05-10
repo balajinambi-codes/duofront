@@ -13,9 +13,9 @@ import {
   getLevelFromXp,
 } from "@/lib/level-system";
 
-import LevelUpModal from "./level-up-modal";
+import LevelUpModal from "@/components/lesson/level-up-modal";
 
-import XpPopup from "./xp-popup";
+import XpPopup from "@/components/lesson/xp-popup";
 
 import {
   Play,
@@ -185,7 +185,7 @@ export default function CodePlayground({
       setSuccess(valid);
 
       /*
-        AUTO COMPLETE LESSON
+        AUTO COMPLETE
       */
       if (
         valid &&
@@ -215,7 +215,7 @@ export default function CodePlayground({
             await response.json();
 
           /*
-            XP REWARD
+            XP
           */
           if (
             data?.xpEarned
@@ -254,7 +254,7 @@ export default function CodePlayground({
   }
 
   /*
-    RESET CODE
+    RESET
   */
   function resetCode() {
     setHtml(defaultHtml);
