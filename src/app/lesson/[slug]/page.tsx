@@ -15,7 +15,7 @@ import CompleteButton from "@/components/lesson/complete-button";
 
 import CodePlayground from "@/components/lesson/code-playground";
 
-import XpPopup from "./xp-popup";
+
 
 import { getProgress } from "@/lib/get-progress";
 
