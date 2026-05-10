@@ -15,10 +15,62 @@ export default function CreateLessonPage() {
     useState("");
 
   async function createLesson() {
-    alert(
-      "Lesson creation API coming next 🚀"
-    );
-  }
+    try {
+        const response =
+        await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/admin/create-lesson`,
+            {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+                title,
+
+                description,
+
+                content,
+
+                slug: title
+                .toLowerCase()
+                .replaceAll(
+                    " ",
+                    "-"
+                ),
+
+                // TEMP PATH ID
+                pathId:
+                "cmoxz303l000013k751d91znj",
+            }),
+            }
+        );
+
+        if (!response.ok) {
+        throw new Error(
+            "Failed to create lesson"
+        );
+        }
+
+        alert(
+        "Lesson created successfully 🚀"
+        );
+
+        setTitle("");
+
+        setDescription("");
+
+        setContent("");
+    } catch (error) {
+        console.error(error);
+
+        alert(
+        "Something went wrong"
+        );
+    }
+    }       
 
   return (
     <AppLayout>
